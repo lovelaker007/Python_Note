@@ -158,7 +158,6 @@ def main(data):
     print("report result: ")
     report(results)
 
-
 # 输出报告
 def report(results):
     for key, result in sorted(results.items()):
@@ -172,47 +171,6 @@ data = {
     'boys;m': [1.6, 1.8, 1.8, 1.7, 1.55, 1.6],
 }
 
-def caller_gene():
-    pass
-
-def mid_gene():
-    try:
-        result = yield from sub_gene()
-    except GeneratorExit as e:
-        print('get GeneratorExit from sub_gene')
-        raise e
-    except BaseException as e:
-        print('get other Exception from sub_gene') 
-        raise e
-
-def sub_gene():
-    try:
-        for i in range(5):
-            r = yield i
-            print('get %d from caller' % (r, ))
-    except GeneratorExit as e:
-        print('get close() call from caller')
-        raise e
-    except BaseException as e:
-        print('get throw() call from caller') 
-        raise e
-
-'''
->>> c = mid_gene()
->>> next(c)
-0
->>> r = c.send(88)
-get 88 from caller
->>> print(r)
-1
->>> r = c.send(88)
-get 88 from caller
->>> print(r)
-2
->>> c.close()
-get close() call from caller
-get GeneratorExit from sub_gene
-'''
 
 if __name__ == '__main__':
     main(data) 
@@ -308,6 +266,49 @@ report result:
 
 '''
 
+
+'''
+
+def caller_gene():
+    pass
+
+def mid_gene():
+    try:
+        result = yield from sub_gene()
+    except GeneratorExit as e:
+        print('get GeneratorExit from sub_gene')
+        raise e
+    except BaseException as e:
+        print('get other Exception from sub_gene') 
+        raise e
+
+def sub_gene():
+    try:
+        for i in range(5):
+            r = yield i
+            print('get %d from caller' % (r, ))
+    except GeneratorExit as e:
+        print('get close() call from caller')
+        raise e
+    except BaseException as e:
+        print('get throw() call from caller') 
+        raise e
+
+>>> c = mid_gene()
+>>> next(c)
+0
+>>> r = c.send(88)
+get 88 from caller
+>>> print(r)
+1
+>>> r = c.send(88)
+get 88 from caller
+>>> print(r)
+2
+>>> c.close()
+get close() call from caller
+get GeneratorExit from sub_gene
+'''
 
 
 
