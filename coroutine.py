@@ -18,6 +18,33 @@ def jump_range(up):
             jump = 1
         index += jump
 
+'''
+当一个生成器对象被销毁时，会抛出一个GeneratorExit异常
+def myGenerator():  
+    try:
+        yield 1
+    except GeneratorExit:
+        print "myGenerator exited"
+ 
+gen = myGenerator()
+print gen.next()
+
+GeneratorExit异常只有在生成器对象被激活后，才有可能产生。更确切的说，
+需要至少调用一次生成器对象的next方法后，系统才会产生GeneratorExit异常
+在上面的示例中，我们都显式地捕获了GeneratorExit异常。如果该异常没有被显式捕获，
+生成器对象也不会把该异常向主程序抛出。因为GeneratorExit异常定义的初衷，是方便开发者在生成器对象调用
+结束后定义一些收尾的工作，如释放资源等。
+'''
+
+'''
+生成器对象的close方法
+生成器对象的close方法会在生成器对象方法的挂起处抛出一个GeneratorExit异常。
+GeneratorExit异常产生后，系统会继续把生成器对象方法后续的代码执行完毕。参见下面的代码。
+
+需要注意的是，GeneratorExit异常的产生意味着生成器对象的生命周期已经结束。
+因此，一旦产生了GeneratorExit异常，生成器方法后续执行的语句中，不能再有yield语句，否则会产生RuntimeError
+'''
+
 
 '''
 协程版本的生产者消费者程序

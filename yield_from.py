@@ -42,7 +42,7 @@ Result = namedtuple('Result', 'count average')
     如果调用throw()方法时抛出 StopIteration 异常，委派生成器恢复运行。
     StopIteration之外的异常会向上冒泡。传给委派生成器。
 6. 如果把 GeneratorExit 异常传入委派生成器，或者在委派生成器上调用close() 方法，
-    那么在子生成器上调用close() 方法，如果他有的话。如果调用close()
+    那么在子生成器上调用close() 方法。如果调用close()
     方法导致异常抛出，那么异常会向上冒泡，传给委派生成器；否则，委派生成器抛出 GeneratorExit 异常。
 
 
@@ -269,8 +269,6 @@ report result:
 '''
 
 
-'''
-
 def caller_gene():
     pass
 
@@ -279,9 +277,6 @@ def mid_gene():
         result = yield from sub_gene()
     except GeneratorExit as e:
         print('get GeneratorExit from sub_gene')
-        raise e
-    except BaseException as e:
-        print('get other Exception from sub_gene') 
         raise e
 
 def sub_gene():
@@ -292,10 +287,8 @@ def sub_gene():
     except GeneratorExit as e:
         print('get close() call from caller')
         raise e
-    except BaseException as e:
-        print('get throw() call from caller') 
-        raise e
 
+'''
 >>> c = mid_gene()
 >>> next(c)
 0
@@ -307,13 +300,18 @@ get 88 from caller
 get 88 from caller
 >>> print(r)
 2
+
 >>> c.close()
 get close() call from caller
 get GeneratorExit from sub_gene
+或者
+>>> c.throw(ValueError('if you'))
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "C:\Users\admin\WWH\python\python笔记\yield_from.py", line 277, in mid_gene
+    result = yield from sub_gene()
+  File "C:\Users\admin\WWH\python\python笔记\yield_from.py", line 285, in sub_gene
+    r = yield i
+ValueError: if you
 '''
-
-
-
-
-
 
