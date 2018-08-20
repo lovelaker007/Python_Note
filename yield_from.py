@@ -32,10 +32,11 @@ Result = namedtuple('Result', 'count average')
 
 对于yield from的意义，网络上的解释
 1. 子生成器产出的值都直接传给委派生成器的调用方（客户端代码）
-2. 使用send()方法发给委派生成器的值都直接传给子生成器。如果发送的值是None，那么会调用子生成器的 next()方法。
+2. 使用send()方法发给委派生成器的值都直接传给子生成器。如果发送的值是None，那么会调用子生成器的next()方法。
     如果发送的值不是None，那么会调用子生成器的send()方法。
-    如果调用的方法抛出StopIteration异常，那么委派生成器恢复运行。任何其他异常都会向上冒泡，传给委派生成器。
-3. 生成器退出时，生成器(或子生成器)中的return expr表达式会触发StopIteration(expr)异常抛出。
+    子生成器在运行的过程中如果引发StopIteration异常，那么委派生成器恢复运行。
+    如果引发任何其他异常都会向上冒泡，传给委派生成器。
+3. 子生成器退出时，return expr表达式会触发StopIteration(expr)异常。
 4. yiled from表达式的值是子生成器终止时传给StopIteration异常的第一个参数。
 5. 传入委派生成器的异常，除了GeneratorExit之外都传给子生成器的throw()方法。
     如果调用throw()方法时抛出 StopIteration 异常，委派生成器恢复运行。
@@ -53,11 +54,12 @@ try:
     _y = next(_i) # 2 预激子生成器，结果保存在_y 中，作为第一个产出的值
 except StopIteration as _e:
     # 3 如果调用的方法抛出StopIteration异常，获取异常对象的value属性，赋值给_r
+    # 补充说明，当迭代器运行完毕，就会自动抛出StopIteration异常
     _r = _e.value
 else:
-    while 1: # 4 运行这个循环时，委派生成器会阻塞，只能作为调用方和子生成器直接的通道
+    while 1: # 4 运行这个循环时，委派生成器会阻塞，只能作为调用方和子生成器之间的通道
         try:
-            _s = yield _y # 5 产出子生成器当前产出的元素；等待调用方发送_s中保存的值。
+            _s = yield _y # 5 产出子生成器当前产出的元素；等待调用方发送值并保存到_s中。
 
         except GeneratorExit as _e:
         # 6 这一部分是用于关闭委派生成器和子生成器，即调用方调用了close方法
@@ -79,7 +81,7 @@ else:
                 # 传入委派生成器的异常，除了 GeneratorExit 之外都传给子生成器的throw()方法。
                 _m = _i.throw
             except AttributeError:
-                # 子生成器一迭代器，没有throw()方法， 调用throw()方法时抛出AttributeError异常传给委派生成器
+                # 子生成器没有throw()方法， 调用throw()方法时抛出AttributeError异常传给委派生成器
                 raise _e
             else: # 8
                 try:
@@ -128,7 +130,7 @@ def averager():
             break
         total += term
         count += 1
-        average = total/count
+    average = total/count
     print("in averager, return result")
     # 返回的Result会成为grouper函数中yield from表达式的值
     return Result(count, average) 

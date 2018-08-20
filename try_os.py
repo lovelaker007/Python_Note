@@ -13,9 +13,9 @@ def func1():
         if i.startswith('.'):
             continue
         if os.path.isfile(i):
-            print '\t文档：%s' % (os.path.join(os.getcwd(), i))
+            print '\tfile: %s' % (os.path.join(os.getcwd(), i))
         if os.path.isdir(i):
-            print '\t文件夹：%s' % (os.path.join(os.getcwd(), i))
+            print '\tdir: %s' % (os.path.join(os.getcwd(), i))
 
 
 if __name__ == '__main__':
