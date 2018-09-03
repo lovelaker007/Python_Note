@@ -45,10 +45,9 @@ GeneratorExit异常产生后，系统会继续把生成器对象方法后续的�
 因此，一旦产生了GeneratorExit异常，生成器方法后续执行的语句中，不能再有yield语句，否则会产生RuntimeError
 '''
 
-
+# 协程的定义：协程可以有多个入口点，可以在指定的位置挂起和回复执行
 '''
 协程版本的生产者消费者程序
-
 1. 生产者调用c.next()：初始化消费者，消费者运行到yield r向外抛出r(此时r为空值)之后暂停
 2. 生产者运行到c.send(n)暂停：向消费者发送n，消费者运行 n = yield r, 将收到的值存放到n中，继续运行
 3. 消费者运行一个循环，再次来到yield r，向外抛出r(r为200 OK)，抛出后暂停
@@ -58,7 +57,6 @@ GeneratorExit异常产生后，系统会继续把生成器对象方法后续的�
 协程版本和多线程版本比较：
 协程是在一个线程之内，由编程者控制流程的跳转，生产者准备好后，跳转到消费者执行，消费者执行返回结果，
 再跳转到生产者，过程中没有全局变量的竞争访问，也不需要锁来保证全局变量的访问安全
-
 '''
 def consumer():
     r = ''
@@ -81,5 +79,32 @@ def produce(c):
     c.close()
 
 
+# 协程，python3.4中的语法
+import asyncio
+@asyncio.coroutine
+def wget(host):
+    print('wget %s...' % host)
+    connect = asyncio.open_connection(host, 80)
+    reader, writer = yield from connect
+    header = 'GET / HTTP/1.0\r\nHost: %s\r\n\r\n' % host
+    writer.write(header.encode('utf-8'))
+    yield from writer.drain()
+    while True:
+        line = yield from reader.readline()
+        if line == b'\r\n':
+            break
+        print('%s header > %s' % (host, line.decode('utf-8').rstrip()))
+    # Ignore the body, close the socket
+    writer.close()
 
+loop = asyncio.get_event_loop()
+tasks = [wget(host) for host in ['www.sina.com.cn', 'www.sohu.com', 'www.163.com']]
+loop.run_until_complete(asyncio.wait(tasks))
+loop.close()
 
+'''
+从Python 3.5开始引入了新的语法async和await，可以让coroutine的代码更简洁易读。
+请注意，async和await是针对coroutine的新语法，要使用新的语法，只需要做两步简单的替换：
+    把@asyncio.coroutine替换为async；
+    把yield from替换为await。
+'''
