@@ -39,6 +39,9 @@ class MyClass():
         # 手动添加fd
         self.fd = open(self.path, 'r')
         return state
+    
+    def say_path(self):
+        print('my path is %s' % (self.path, ))
 
   
 def dump_inner_object():
@@ -67,6 +70,8 @@ def dump_myclass():
         pickle.dump(m1, f)  
 
 def load_myclass():
+    # 自定义的对象被序列化后，序列化的只是对象自己的属性
+    # 对向的类的信息没有被序列化进去，在反序列化的时候，执行环境中，要有对象所属的类
     with open('pickle_file', 'rb') as f:
         m1 = pickle.load(f)  
         print(m1.fd)  
