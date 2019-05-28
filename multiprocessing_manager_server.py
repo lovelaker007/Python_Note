@@ -18,6 +18,7 @@ class QueueManager(BaseManager):
 QueueManager.register('get_task_queue', callable=lambda: task_queue)
 QueueManager.register('get_result_queue', callable=lambda: result_queue)
 manager = QueueManager(address=(SERVER_IP, 8888), authkey='laker')
+
 # 启动Queue:
 manager.start()
 # 获得通过网络访问的Queue对象:
@@ -28,6 +29,7 @@ for i in range(10):
     n = random.randint(0, 10000)
     print('Put task %d...' % n)
     task.put(n)
+    
 # 从result队列读取结果:
 print('Try get results...')
 for i in range(10):

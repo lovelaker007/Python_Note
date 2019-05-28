@@ -8,7 +8,7 @@ class multiprocessing.Pool([processes[, initializer[, initargs[, maxtasksperchil
     
     apply(func[, args[, kwds]])
     挑选进程池中的一个进程，运行func，并将args解包后作为参数传入(args是元祖类型)
-    调用func时会阻塞，直到调用完成
+    调用func时会阻塞，直到调用完成, 就是说，如果进程池要执行多个任务，这些任务是串行执行的
 
     apply_async(func[, args[, kwds[, callback]]])
     非阻塞的调用形式，立即返回multiprocessing.pool.AsyncResult类对象result
@@ -86,6 +86,9 @@ def pow3(x):
 def noop(x):
     pass
 
+def exce_task():
+    time.sleep(random.randint(1,3))
+    raise ValueError('error')
 
 def create_pool():
     PROCESSES = 4
@@ -93,7 +96,17 @@ def create_pool():
     global pool
     pool = multiprocessing.Pool(PROCESSES)
     print 'pool = %s' % pool
-    print
+
+def create_task(add_exception_task=False):
+    global TASKS
+    TASKS = [(mul, (i, 7)) for i in range(10)] + \
+                [(plus, (i, 8)) for i in range(10)]
+    
+    if add_exception_task:
+        TASKS.append((exce_task, ()))
+    print 'create tasks done'
+    print TASKS
+
 
 def try_apply():
     print 'try apply'
@@ -221,14 +234,13 @@ def try_callback():
 
 
 if __name__ == '__main__':
-    pool = None
-    TASKS = [(mul, (i, 7)) for i in range(10)] + \
-                [(plus, (i, 8)) for i in range(10)]
-
+    
     create_pool()
+    create_task(add_exception_task=True)
 
-    try_callback()
-
+    try_apply_async()
+    pool.close()
+    pool.join()
 
 
 
