@@ -2,16 +2,13 @@
 
 '''
 sem内部维护一个计数器，所有的操作不能使计数器值小于0
-
 threading.Semaphore
     创建一个sem时，可以指定初始值
-
     acquire()：获得sem，将sem的值减1，有可能会阻塞
     release(): 释放sem，将sem加1
-
 下面的实例，建立了一个线程池，最多只有规定数量的线程进入线程池
-
 '''
+
 import threading
 import logging
 import random

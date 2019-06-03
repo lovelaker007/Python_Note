@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 # 在新建类的时候，传递name, parents, attrs参数即可
 def upper_attr(class_name, class_parents, class_attrs):
     attrs = [(key, value) for key, value in class_attrs.items() if not key.startswith('__')]
